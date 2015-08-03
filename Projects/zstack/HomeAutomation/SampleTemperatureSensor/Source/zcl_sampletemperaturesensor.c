@@ -715,8 +715,8 @@ static void zclSampleTemperatureSensor_ProcessIdentifyTimeChange( void )
 {
   if ( zclSampleTemperatureSensor_IdentifyTime > 0 )
   {
-    osal_start_timerEx( zclSampleTemperatureSensor_TaskID, SAMPLETEMPERATURESENSOR_IDENTIFY_TIMEOUT_EVT, 1000 );
-    HalLedBlink ( HAL_LED_4, 0xFF, HAL_LED_DEFAULT_DUTY_CYCLE, HAL_LED_DEFAULT_FLASH_TIME );
+    //osal_start_timerEx( zclSampleTemperatureSensor_TaskID, SAMPLETEMPERATURESENSOR_IDENTIFY_TIMEOUT_EVT, 1000 );
+    //HalLedBlink ( HAL_LED_4, 0xFF, HAL_LED_DEFAULT_DUTY_CYCLE, HAL_LED_DEFAULT_FLASH_TIME );
   }
   else
   {
