@@ -438,7 +438,7 @@ static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys )
     }
 
     // Send temperature information
-    zclSampleTemperatureSensor_SendTemp();
+    // zclSampleTemperatureSensor_SendTemp();
   }
 
   if ( keys & HAL_KEY_SW_2 )
@@ -511,7 +511,7 @@ static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys )
     }
 
     // Send temperature information
-    zclSampleTemperatureSensor_SendTemp();
+    // zclSampleTemperatureSensor_SendTemp();
   }
 
   if ( keys & HAL_KEY_SW_4 )
