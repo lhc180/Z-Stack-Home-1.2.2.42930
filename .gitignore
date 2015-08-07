@@ -90,6 +90,10 @@ Temporary Items
 *.dni
 *.dbgdt
 *.ewt
+*.s51
+*.lst
+*.r51
+*.d51
 
 # Other
 /Accessories/
