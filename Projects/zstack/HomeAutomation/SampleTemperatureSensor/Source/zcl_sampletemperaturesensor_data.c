@@ -97,7 +97,7 @@ uint8  zclSampleTemperatureSensor_OnOff = LIGHT_OFF;
 // Temperature Sensor Cluster
 uint16 zclSampleTemperatureSensor_MeasuredValue;  // 22.00C
 const int16 zclSampleTemperatureSensor_MinMeasuredValue = 0;   // 0.00C
-const uint16 zclSampleTemperatureSensor_MaxMeasuredValue = 655000;  // 100.00C
+const uint16 zclSampleTemperatureSensor_MaxMeasuredValue = 65500;  // 100.00C
 
 /*********************************************************************
  * ATTRIBUTE DEFINITIONS - Uses REAL cluster IDs

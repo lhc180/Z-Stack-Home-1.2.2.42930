@@ -449,7 +449,7 @@ static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys )
 
     if ( zclSampleTemperatureSensor_MeasuredValue < zclSampleTemperatureSensor_MaxMeasuredValue )
     {
-      zclSampleTemperatureSensor_MeasuredValue = zclSampleTemperatureSensor_MeasuredValue + 100;  // considering using whole number value
+      zclSampleTemperatureSensor_MeasuredValue = zclSampleTemperatureSensor_MeasuredValue + 1000;  // considering using whole number value
     }
     else if ( zclSampleTemperatureSensor_MeasuredValue >= zclSampleTemperatureSensor_MaxMeasuredValue )
     {
@@ -522,7 +522,7 @@ static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys )
     // decrease the temperature
     if ( zclSampleTemperatureSensor_MeasuredValue > zclSampleTemperatureSensor_MinMeasuredValue )
     {
-      zclSampleTemperatureSensor_MeasuredValue = zclSampleTemperatureSensor_MeasuredValue - 100;  // considering using whole number value
+      zclSampleTemperatureSensor_MeasuredValue = zclSampleTemperatureSensor_MeasuredValue - 1000;  // considering using whole number value
     }
     else if ( zclSampleTemperatureSensor_MeasuredValue >= zclSampleTemperatureSensor_MinMeasuredValue )
     {
