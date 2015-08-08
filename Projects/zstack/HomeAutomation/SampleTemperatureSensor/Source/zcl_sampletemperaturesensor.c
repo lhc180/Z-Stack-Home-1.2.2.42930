@@ -82,6 +82,7 @@
 #include "hal_lcd.h"
 #include "hal_led.h"
 #include "hal_key.h"
+#include "hal_adc.h"
 
 
 /*********************************************************************
@@ -89,7 +90,7 @@
  */
 
 // how often to report temperature
-#define SAMPLETEMPERATURESENSOR_REPORT_INTERVAL   10000
+#define SAMPLETEMPERATURESENSOR_REPORT_INTERVAL  10000          //10000 milliseconds = 10 seconds
 
 /*********************************************************************
  * CONSTANTS
@@ -116,6 +117,7 @@ static byte gPermitDuration = 0x00;
  * LOCAL VARIABLES
  */
 afAddrType_t zclSampleTemperatureSensor_DstAddr;
+static int reads = 0;
 
 #ifdef ZCL_EZMODE
 static void zclSampleTemperatureSensor_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg );
@@ -159,6 +161,7 @@ static endPointDesc_t sampleTemperatureSensor_TestEp =
 /*********************************************************************
  * LOCAL FUNCTIONS
  */
+static int16 readTemp(void);
 static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys );
 static void zclSampleTemperatureSensor_BasicResetCB( void );
 static void zclSampleTemperatureSensor_IdentifyCB( zclIdentify_t *pCmd );
@@ -392,16 +395,21 @@ uint16 zclSampleTemperatureSensor_event_loop( uint8 task_id, uint16 events )
     return ( events ^ SAMPLETEMPERATURESENSOR_MAIN_SCREEN_EVT );
   }
 
-  if ( events & SAMPLETEMPERATURESENSOR_TEMP_SEND_EVT )
+  if ( events & SAMPLETEMPERATURESENSOR_TEMP_SEND_EVT )			//THIS IS THE TEMPERATURE READING
   {
-    zclSampleTemperatureSensor_SendTemp();
+    zclSampleTemperatureSensor_MeasuredValue = readTemp() ;
+    ++reads;
+    
+    if ( reads == 1 ){
+      zclSampleTemperatureSensor_SendTemp();
+      reads = 0;
+    }
 
-    // report current temperature reading every 10 seconds
+    // restart current temperature reading counter
     osal_start_timerEx( zclSampleTemperatureSensor_TaskID, SAMPLETEMPERATURESENSOR_TEMP_SEND_EVT, SAMPLETEMPERATURESENSOR_REPORT_INTERVAL );
 
     return ( events ^ SAMPLETEMPERATURESENSOR_TEMP_SEND_EVT );
   }
-
   // Discard unknown events
   return 0;
 }
@@ -558,7 +566,7 @@ static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys )
 }
 
 /*********************************************************************
- * @fn      zclSampleTemperatureSensor_LcdDisplayUpdate
+ * @fn      zclSampleTemperatureSensor_LcdDisplayUpdate		//these can be shut off for power saving
  *
  * @brief   Called to update the LCD display.
  *
@@ -669,6 +677,76 @@ void zclSampleTemperatureSensor_LcdDisplayHelpMode( void )
   HalLcdWriteString( (char *)sSwEZMode, HAL_LCD_LINE_2 );
   HalLcdWriteString( (char *)sSwTempDown, HAL_LCD_LINE_3 );
 #endif
+}
+
+/*********************************************************************
+ * @fn      readTemp
+ *
+ * @brief   Called to read current temperature via the ADC
+ *
+ * @param   none
+ *
+ * @return  none
+ */
+int16 readTemp(void)
+{
+  static uint16 voltageAtTemp22;
+  static uint8 bCalibrate=TRUE; // Calibrate the first time the temp sensor is read
+  uint16 value;
+  int8 temp;
+
+  #if defined (HAL_MCU_CC2530)
+  ATEST = 0x01;
+  TR0  |= 0x01;
+ 
+  /* Clear ADC interrupt flag */
+  ADCIF = 0;
+
+  ADCCON3 = (HAL_ADC_REF_125V | 0x30 | HAL_ADC_CHN_TEMP);
+
+  /* Wait for the conversion to finish */
+  while ( !ADCIF );
+
+  /* Get the result */
+  value = ADCL;
+  value |= ((uint16) ADCH) << 8;
+
+  // Use the 12 MSB of adcValue
+  value >>= 4;
+ 
+  /*
+   * These parameters are typical values and need to be calibrated
+   * See the datasheet for the appropriate chip for more details
+   * also, the math below may not be very accurate
+   */
+    /* Assume ADC = 1480 at 25C and ADC = 4/C */
+  #define VOLTAGE_AT_TEMP_25        1480
+  #define TEMP_COEFFICIENT          4
+
+  // Calibrate for 22C the first time the temp sensor is read.
+  // This will assume that the demo is started up in temperature of 22C
+  if(bCalibrate) {
+    voltageAtTemp22=value;
+    bCalibrate=FALSE;
+  }
+ 
+  temp = 22 + ( (value - voltageAtTemp22) / TEMP_COEFFICIENT );
+ 
+  // Set 0C as minimum temperature, and 100C as max
+  if( temp >= 100)
+  {
+    return 100*100;
+  }
+  else if (temp <= 0) {
+    return 0;
+  }
+  else {
+    return temp*100;
+  }
+  // Only CC2530 is supported
+  #else
+  return 0;
+  #endif
 }
 
 /*********************************************************************
