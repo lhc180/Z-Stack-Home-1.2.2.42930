@@ -91,7 +91,7 @@ extern uint8  zclSampleTemperatureSensor_OnOff;
 extern uint16 zclSampleTemperatureSensor_IdentifyTime;
 
 // Temperature Measurement Cluster
-extern int16 zclSampleTemperatureSensor_MeasuredValue;
+extern uint16 zclSampleTemperatureSensor_MeasuredValue;
 extern const int16 zclSampleTemperatureSensor_MinMeasuredValue;
 extern const uint16 zclSampleTemperatureSensor_MaxMeasuredValue;
 

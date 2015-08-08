@@ -706,7 +706,7 @@ int16 readTempVolt(void)
   uint16 value;
   uint16 voltage;
   int8 temp;
-  int16 temp2;
+  uint16 temp2;
   
   #if defined (HAL_MCU_CC2530)
   
@@ -747,16 +747,16 @@ int16 readTempVolt(void)
  
   temp = 22 + ( (value - voltageAtTemp22) / TEMP_COEFFICIENT );
  
-  // Set 0C as minimum temperature, and 100C as max
-  if( temp >= 100)
+  // Set 0C as minimum temperature, and 64.9C as max
+  if( temp >= 65.5)
   {
-    temp2 = 100*100;
+    temp2 = 65.5*1000;
   }
   else if (temp <= 0) {
     temp2 = 0;
   }
   else {
-    temp2 = temp*100;
+    temp2 = temp*1000;
   }
 
   /*** READ VOLTAGE ***/
@@ -808,7 +808,7 @@ static void zclSampleTemperatureSensor_SendTemp( void )
   {
     pReportCmd->numAttr = 1;
     pReportCmd->attrList[0].attrID = ATTRID_MS_TEMPERATURE_MEASURED_VALUE;
-    pReportCmd->attrList[0].dataType = ZCL_DATATYPE_INT16;
+    pReportCmd->attrList[0].dataType = ZCL_DATATYPE_UINT16;
     pReportCmd->attrList[0].attrData = (void *)(&zclSampleTemperatureSensor_MeasuredValue);
 
     zcl_SendReportCmd( SAMPLETEMPERATURESENSOR_ENDPOINT, &zclSampleTemperatureSensor_DstAddr,
