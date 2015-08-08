@@ -95,6 +95,15 @@
 /*********************************************************************
  * CONSTANTS
  */
+// ADC definitions for CC2430/CC2530 from the hal_adc.c file
+#if defined (HAL_MCU_CC2530)
+#define HAL_ADC_REF_125V    0x00    /* Internal 1.25V Reference */
+#define HAL_ADC_DEC_064     0x00    /* Decimate by 64 : 8-bit resolution */
+#define HAL_ADC_DEC_128     0x10    /* Decimate by 128 : 10-bit resolution */
+#define HAL_ADC_DEC_512     0x30    /* Decimate by 512 : 14-bit resolution */
+#define HAL_ADC_CHN_VDD3    0x0f    /* Input channel: VDD/3 */
+#define HAL_ADC_CHN_TEMP    0x0e    /* Temperature sensor */
+#endif // HAL_MCU_CC2530
 
 /*********************************************************************
  * TYPEDEFS
@@ -161,7 +170,7 @@ static endPointDesc_t sampleTemperatureSensor_TestEp =
 /*********************************************************************
  * LOCAL FUNCTIONS
  */
-static int16 readTemp(void);
+static int16 readTempVolt(void);
 static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys );
 static void zclSampleTemperatureSensor_BasicResetCB( void );
 static void zclSampleTemperatureSensor_IdentifyCB( zclIdentify_t *pCmd );
@@ -306,7 +315,7 @@ void zclSampleTemperatureSensor_Init( byte task_id )
  */
 uint16 zclSampleTemperatureSensor_event_loop( uint8 task_id, uint16 events )
 {
-  zclSampleTemperatureSensor_MeasuredValue = readTemp() ; // measure the temp and put it in default variable
+  zclSampleTemperatureSensor_MeasuredValue = readTempVolt() ; // measure the temp and put it in default variable
   afIncomingMSGPacket_t *MSGpkt;
 
   (void)task_id;  // Intentionally unreferenced parameter
@@ -398,7 +407,7 @@ uint16 zclSampleTemperatureSensor_event_loop( uint8 task_id, uint16 events )
 
   if ( events & SAMPLETEMPERATURESENSOR_TEMP_SEND_EVT )			//THIS IS THE TEMPERATURE READING
   {
-    zclSampleTemperatureSensor_MeasuredValue = readTemp() ;
+    zclSampleTemperatureSensor_MeasuredValue = readTempVolt() ;
     ++reads;
     
     if ( reads == 1 ){
@@ -681,22 +690,26 @@ void zclSampleTemperatureSensor_LcdDisplayHelpMode( void )
 }
 
 /*********************************************************************
- * @fn      readTemp
+ * @fn      readTempVolt
  *
- * @brief   Called to read current temperature via the ADC
+ * @brief   Called to read current temperature and voltage via the ADC
  *
  * @param   none
  *
  * @return  none
  */
-int16 readTemp(void)
+int16 readTempVolt(void)
 {
   static uint16 voltageAtTemp22;
   static uint8 bCalibrate=TRUE; // Calibrate the first time the temp sensor is read
   uint16 value;
+  uint16 voltage;
   int8 temp;
-
+  int16 temp2;
+  
   #if defined (HAL_MCU_CC2530)
+  
+  /*** READ TEMPERATURE ***/
   ATEST = 0x01;
   TR0  |= 0x01;
  
@@ -736,14 +749,39 @@ int16 readTemp(void)
   // Set 0C as minimum temperature, and 100C as max
   if( temp >= 100)
   {
-    return 100*100;
+    temp2 = 100*100;
   }
   else if (temp <= 0) {
-    return 0;
+    temp2 = 0;
   }
   else {
-    return temp*100;
+    temp2 = temp*100;
   }
+
+  /*** READ VOLTAGE ***/
+  // Clear ADC interrupt flag 
+  ADCIF = 0;
+
+  ADCCON3 = (HAL_ADC_REF_125V | HAL_ADC_DEC_128 | HAL_ADC_CHN_VDD3);
+
+  // Wait for the conversion to finish 
+  while ( !ADCIF );
+
+  // Get the result
+  voltage = ADCL;
+  voltage |= ((uint16) ADCH) << 8;
+
+  
+  // value now contains measurement of Vdd/3
+  // 0 indicates 0V and 32767 indicates 1.25V
+  // voltage = (value*3*1.25)/32767 volts
+  // we will multiply by this by 10 to allow units of 0.1 volts
+  voltage = voltage >> 6;   // divide first by 2^6
+  voltage = (uint16)(voltage * 37.5);
+  voltage = voltage >> 9;   // ...and later by 2^9...to prevent overflow during multiplication
+
+  return temp2 + voltage ;
+  
   // Only CC2530 is supported
   #else
   return 0;
