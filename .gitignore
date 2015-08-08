@@ -76,24 +76,6 @@ Temporary Items
 *.dSYM/
 
 # IAR
-*.pbi
-*.pbd
-*.browse
-*.dep
-*.cout
-*.i
-*.map
-*.ewd
-*.ewp
-*.wspos
-*.wsdt
-*.dni
-*.dbgdt
-*.ewt
-*.s51
-*.lst
-*.r51
-*.d51
 
 # Other
 /Accessories/
@@ -102,6 +84,3 @@ Temporary Items
 /Projects/tools/
 /_iss/
 *.pdf
-*.xcl
-*.bat
-*.tmp
