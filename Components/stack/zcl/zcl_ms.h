@@ -98,7 +98,7 @@ extern "C"
 /***    Temperature Measurement Cluster Attributes                         ***/
 /*****************************************************************************/
   // Temperature Measurement Information attributes set
-#define ATTRID_MS_TEMPERATURE_MEASURED_VALUE                             0x0000 // M, R, INT16
+#define ATTRID_MS_TEMPERATURE_MEASURED_VALUE                             0x0000 // M, R, UINT16
 #define ATTRID_MS_TEMPERATURE_MIN_MEASURED_VALUE                         0x0001 // M, R, INT16
 #define ATTRID_MS_TEMPERATURE_MAX_MEASURED_VALUE                         0x0002 // M, R, INT16
 #define ATTRID_MS_TEMPERATURE_TOLERANCE                                  0x0003 // O, R, UINT16
