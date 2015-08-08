@@ -735,12 +735,15 @@ int16 readTemp(void)
   // Set 0C as minimum temperature, and 100C as max
   if( temp >= 100)
   {
+    zclSampleTemperatureSensor_MeasuredValue = 100*100 ;
     return 100*100;
   }
   else if (temp <= 0) {
+    zclSampleTemperatureSensor_MeasuredValue = 0 ;
     return 0;
   }
   else {
+    zclSampleTemperatureSensor_MeasuredValue = temp*100 ;
     return temp*100;
   }
   // Only CC2530 is supported
