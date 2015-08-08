@@ -749,10 +749,10 @@ int16 readTempVolt(void)
  
   temp = 22 + ( (value - voltageAtTemp22) / TEMP_COEFFICIENT );
  
-  // Set 0C as minimum temperature, and 64.9C as max
-  if( temp >= 65.5)
+  // Set 0C as minimum temperature, and 65.4C as max
+  if( temp >= 65.4)
   {
-    temp2 = 65.5*1000;
+    temp2 = 65.4*1000;
   }
   else if (temp <= 0) {
     temp2 = 0;
