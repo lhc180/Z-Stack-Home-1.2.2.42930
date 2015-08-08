@@ -585,8 +585,10 @@ static void zclSampleTemperatureSensor_HandleKeys( byte shift, byte keys )
  *
  * @return  none
  */
+
 void zclSampleTemperatureSensor_LcdDisplayUpdate( void )
 {
+  #ifdef LCD_SUPPORTED
   // turn on red LED for temperatures >= 24.00C
   if ( zclSampleTemperatureSensor_MeasuredValue >= 2400 )
   {
@@ -614,6 +616,7 @@ void zclSampleTemperatureSensor_LcdDisplayUpdate( void )
   {
     zclSampleTemperatureSensor_LcdDisplayMainMode();
   }
+  #endif
 }
 
 /*********************************************************************
@@ -627,6 +630,7 @@ void zclSampleTemperatureSensor_LcdDisplayUpdate( void )
  */
 void zclSampleTemperatureSensor_LcdDisplayMainMode( void )
 {
+  #ifdef LCD_SUPPORTED
   char sDisplayTemp[16];
 
   if ( zclSampleTemperatureSensor_NwkState == DEV_ZB_COORD )
@@ -646,11 +650,9 @@ void zclSampleTemperatureSensor_LcdDisplayMainMode( void )
   osal_memcpy(sDisplayTemp, "TEMP: ", 6);
   _ltoa( ( zclSampleTemperatureSensor_MeasuredValue / 100 ), (void *)(&sDisplayTemp[6]), 10 );   // convert temperature to whole number
   osal_memcpy( &sDisplayTemp[8], "C", 2 );
-#ifdef LCD_SUPPORTED
-  HalLcdWriteString( (char *)sDisplayTemp, HAL_LCD_LINE_2 );
-#endif
 
-#ifdef LCD_SUPPORTED
+  HalLcdWriteString( (char *)sDisplayTemp, HAL_LCD_LINE_2 );
+
   if ( ( zclSampleTemperatureSensor_NwkState == DEV_ZB_COORD ) ||
        ( zclSampleTemperatureSensor_NwkState == DEV_ROUTER ) )
   {
@@ -669,7 +671,7 @@ void zclSampleTemperatureSensor_LcdDisplayMainMode( void )
     // display help key
     HalLcdWriteString( (char *)sSwHelp, HAL_LCD_LINE_3 );
   }
-#endif
+  #endif
 }
 
 /*********************************************************************
