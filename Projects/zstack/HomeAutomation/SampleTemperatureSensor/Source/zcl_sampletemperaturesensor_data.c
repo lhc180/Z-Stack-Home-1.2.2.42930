@@ -95,7 +95,7 @@ uint16 zclSampleTemperatureSensor_IdentifyTime = 0;
 uint8  zclSampleTemperatureSensor_OnOff = LIGHT_OFF;
 
 // Temperature Sensor Cluster
-int16 zclSampleTemperatureSensor_MeasuredValue = 2200;  // 22.00C
+int16 zclSampleTemperatureSensor_MeasuredValue;  // 22.00C
 const int16 zclSampleTemperatureSensor_MinMeasuredValue = 0;   // 0.00C
 const uint16 zclSampleTemperatureSensor_MaxMeasuredValue = 10000;  // 100.00C
 

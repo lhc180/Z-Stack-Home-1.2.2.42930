@@ -306,6 +306,7 @@ void zclSampleTemperatureSensor_Init( byte task_id )
  */
 uint16 zclSampleTemperatureSensor_event_loop( uint8 task_id, uint16 events )
 {
+  zclSampleTemperatureSensor_MeasuredValue = readTemp() ; // measure the temp and put it in default variable
   afIncomingMSGPacket_t *MSGpkt;
 
   (void)task_id;  // Intentionally unreferenced parameter
