@@ -59,10 +59,18 @@ extern "C"
  */
 
 /* LEDS - The LED number is the same as the bit position */
-#define HAL_LED_1     0x01
-#define HAL_LED_2     0x02
-#define HAL_LED_3     0x04
-#define HAL_LED_4     0x08
+#ifdef LCD_SUPPORTED
+  #define HAL_LED_1     0x01
+  #define HAL_LED_2     0x02
+  #define HAL_LED_3     0x04
+  #define HAL_LED_4     0x08
+#else
+  #define HAL_LED_1     0x00
+  #define HAL_LED_2     0x00
+  #define HAL_LED_3     0x00
+  #define HAL_LED_4     0x00
+#endif
+  
 #define HAL_LED_ALL   (HAL_LED_1 | HAL_LED_2 | HAL_LED_3 | HAL_LED_4)
 
 /* Modes */
