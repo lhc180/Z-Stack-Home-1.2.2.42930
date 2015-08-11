@@ -750,7 +750,7 @@ int16 readTempVolt(void)
   temp = 22 + ( (value - voltageAtTemp22) / TEMP_COEFFICIENT );
  
   // Set 0C as minimum temperature, and 65.4C as max
-  if( temp >= 65.4)
+  if (temp >= 65.4)
   {
     temp2 = 65.4*1000;
   }
@@ -783,6 +783,18 @@ int16 readTempVolt(void)
   voltage = (uint16)(voltage * 37.5);
   voltage = voltage >> 9;   // ...and later by 2^9...to prevent overflow during multiplication
 
+  // Set 0.1V as minimum voltage, and 9.9V as max
+  if (voltage >= 99)
+  {
+    voltage = 99;
+  }
+  else if (voltage <= 1) {
+    voltage = 1;
+  }
+  else {
+    voltage = voltage;
+  }
+  
   return temp2 + voltage ;
   
   // Only CC2530 is supported
